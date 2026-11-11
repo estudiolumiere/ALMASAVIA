@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ALMASAVIA · Test A/B del checkout móvil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --olivo:#3E4A32; --olivo-2:#55633F; --lona:#ECE8DF; --papel:#F8F6F1;
+  --tinta:#1D2119; --gris:#6B6E66; --linea:#D5D0C4; --mostaza:#C49A1C;
+  --friccion:#9A3D2E; --friccion-bg:#F3E3DE; --mejora:#3E4A32; --mejora-bg:#E4E9D8;
+  --phone:#20241D; --screen:#FFFFFF; --field:#F2F1EE; --on-olivo:#F8F6F1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --olivo:#9DB07F; --olivo-2:#B4C596; --lona:#22261F; --papel:#171A15;
+    --tinta:#ECEAE3; --gris:#A3A69C; --linea:#3A3F35; --mostaza:#E0B73A;
+    --friccion:#E59A86; --friccion-bg:#3A2420; --mejora:#B4C596; --mejora-bg:#2B3324;
+    --phone:#0D0F0B; --screen:#23271F; --field:#2E3329; --on-olivo:#171A15;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--papel);color:var(--tinta);font-family:"Archivo",Arial,Helvetica,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--mostaza);outline-offset:2px}
+
+/* Hero */
+.hero{background:var(--olivo);color:var(--on-olivo);padding:56px 0 64px}
+.marca{font-weight:700;font-stretch:125%;font-size:15px;letter-spacing:.02em;margin:0 0 48px;opacity:.9}
+.hero h1{font-stretch:62%;font-weight:800;font-size:clamp(56px,11vw,132px);line-height:.88;margin:0;letter-spacing:-.01em}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:end}
+.hero p.hip{font-size:20px;line-height:1.5;max-width:34ch;margin:0}
+.hero p.hip strong{font-weight:700}
+.problema{margin-top:48px;border-top:1px solid color-mix(in srgb,var(--on-olivo) 35%,transparent);padding-top:24px;display:flex;gap:40px;flex-wrap:wrap}
+.problema div{min-width:150px}
+.problema b{display:block;font-stretch:62%;font-size:44px;font-weight:700;line-height:1}
+.problema span{font-size:15px;opacity:.85}
+
+/* Secciones */
+section{padding:72px 0}
+h2{font-stretch:75%;font-weight:800;font-size:clamp(34px,5vw,52px);line-height:1;margin:0 0 12px}
+.intro{color:var(--gris);max-width:62ch;margin:0 0 40px}
+
+/* Selector móvil */
+.tabs{display:none;gap:8px;margin-bottom:24px}
+.tabs button{flex:1;font:inherit;font-weight:700;padding:12px;border-radius:10px;border:1.5px solid var(--linea);background:transparent;color:var(--tinta);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+
+.versiones{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.version{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start}
+.version h3{font-stretch:75%;font-size:28px;font-weight:800;margin:0 0 4px;line-height:1.05}
+.version .sub{color:var(--gris);font-size:15px;margin:0 0 16px}
+.notas{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.notas li{font-size:15px;line-height:1.4;padding:10px 12px;border-radius:8px}
+.v-a .notas li{background:var(--friccion-bg);color:var(--friccion)}
+.v-b .notas li{background:var(--mejora-bg);color:var(--mejora)}
+.notas li b{display:block;color:var(--tinta);font-weight:700}
+
+/* Celular */
+.phone{width:262px;background:var(--phone);border-radius:38px;padding:12px;box-shadow:0 18px 40px -18px rgba(0,0,0,.45)}
+.screen{background:var(--screen);border-radius:28px;height:520px;overflow:hidden;display:flex;flex-direction:column;color:var(--tinta)}
+.bar{height:26px;display:flex;justify-content:center;align-items:center}
+.bar::before{content:"";width:70px;height:6px;border-radius:6px;background:var(--linea)}
+.app-head{padding:4px 16px 10px;border-bottom:1px solid var(--linea)}
+.app-head .logo{font-weight:800;font-stretch:125%;font-size:12px}
+.app-head .paso{font-size:12px;color:var(--gris)}
+.prog{height:4px;background:var(--linea);border-radius:4px;margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--olivo);transition:width .3s}
+.body{flex:1;overflow-y:auto;padding:14px 16px;font-size:13px}
+.body h4{margin:0 0 10px;font-size:16px;font-weight:700}
+.f{background:var(--field);border-radius:8px;padding:8px 10px;margin-bottom:7px;color:var(--gris);font-size:12px}
+.f.auto{color:var(--olivo);font-weight:600}
+.row{display:flex;gap:6px}.row .f{flex:1}
+.aviso{font-size:11.5px;padding:7px 9px;border-radius:8px;margin:8px 0;line-height:1.35}
+.aviso.mal{background:var(--friccion-bg);color:var(--friccion)}
+.aviso.bien{background:var(--mejora-bg);color:var(--mejora)}
+.opt{display:flex;justify-content:space-between;border:1.5px solid var(--linea);border-radius:8px;padding:9px 10px;margin-bottom:7px;font-size:12.5px}
+.opt.sel{border-color:var(--olivo)}
+.opt.mp{background:#009EE3;color:#fff;border-color:#009EE3;font-weight:700;justify-content:center}
+.tot{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
+.tot.big{font-weight:800;font-size:15px;border-top:1px solid var(--linea);margin-top:6px;padding-top:8px}
+.resumen{background:var(--lona);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;display:flex;justify-content:space-between}
+.cta{padding:12px 16px 16px;border-top:1px solid var(--linea)}
+.cta button{width:100%;font:inherit;font-weight:700;font-size:14px;padding:12px;border-radius:10px;border:0;background:var(--tinta);color:var(--papel);cursor:pointer}
+.v-b .cta button{background:var(--olivo);color:var(--on-olivo)}
+.pasos{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.pasos button{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--linea);background:transparent;color:var(--gris);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.pasos button[aria-current="step"]{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.hecho{text-align:center;padding-top:40px}
+.hecho b{display:block;font-size:40px}
+
+/* Medición */
+.medicion{background:var(--lona)}
+.tabla{width:100%;border-collapse:collapse;font-size:16px}
+.tabla th,.tabla td{text-align:left;vertical-align:top;padding:16px 16px 16px 0;border-bottom:1px solid var(--linea)}
+.tabla th{width:28%;font-weight:700}
+.tabla td small{display:block;color:var(--gris);font-size:14px;margin-top:4px}
+.scroll{overflow-x:auto}
+
+/* Impacto */
+.impacto{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:2px solid var(--tinta)}
+.impacto div{padding:20px 20px 0 0}
+.impacto b{display:block;font-stretch:62%;font-weight:700;font-size:48px;line-height:1;color:var(--olivo)}
+.impacto span{display:block;font-size:15px;color:var(--gris);margin-top:6px}
+footer{padding:32px 0 48px;color:var(--gris);font-size:14px;border-top:1px solid var(--linea)}
+
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr}
+  .versiones{grid-template-columns:1fr}
+  .tabs{display:flex}
+  .version{display:none}
+  .version.activa{display:grid}
+}
+@media (max-width:620px){
+  .version{grid-template-columns:1fr;justify-items:center}
+  .version>div:last-child{width:100%}
+  .impacto{grid-template-columns:1fr 1fr}
+  .tabla th{width:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="marca">ALMASAVIA</p>
+    <div class="hero-grid">
+      <h1>Test A/B del checkout móvil</h1>
+      <p class="hip"><strong>Hipótesis:</strong> si simplificamos el checkout en el celular y mostramos desde el inicio el costo de envío, las billeteras virtuales y las cuotas, más personas van a terminar la compra.</p>
+    </div>
+    <div class="problema" aria-label="Situación actual, septiembre de 2026">
+      <div><b>74%</b><span>de las visitas llega desde el celular</span></div>
+      <div><b>1,4%</b><span>convierte en celular (4,1% en computadora)</span></div>
+      <div><b>66%</b><span>abandona después de iniciar el checkout</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <h2>Las dos versiones</h2>
+    <p class="intro">Durante el test, la mitad de las personas que compran desde el celular ve el checkout actual y la otra mitad, el simplificado. Recorré cada versión con el botón del celular.</p>
+
+    <div class="tabs" role="tablist" aria-label="Elegir versión">
+      <button role="tab" aria-selected="true" data-tab="a">Versión A · actual</button>
+      <button role="tab" aria-selected="false" data-tab="b">Versión B · simplificada</button>
+    </div>
+
+    <div class="versiones">
+      <article class="version v-a activa" data-version="a">
+        <div>
+          <div class="phone"><div class="screen" id="screen-a"></div></div>
+          <div class="pasos" id="pasos-a" aria-label="Pasos de la versión A"></div>
+        </div>
+        <div>
+          <h3>Versión A: el checkout actual</h3>
+          <p class="sub">4 pasos y 19 campos para completar.</p>
+          <ul class="notas">
+            <li><b>Cuenta obligatoria</b>Hay que crear usuario y contraseña antes de comprar.</li>
+            <li><b>Demasiados campos</b>Se piden datos que no hacen falta para enviar, como DNI y fecha de nacimiento.</li>
+            <li><b>Envío sorpresa</b>El costo de envío aparece recién en el último paso.</li>
+            <li><b>Un solo medio de pago</b>Solo tarjeta, cargada a mano, y sin cuotas visibles.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="version v-b" data-version="b">
+        <div>
+          <div class="phone"><div class="screen" id="screen-b"></div></div>
+          <div class="pasos" id="pasos-b" aria-label="Pasos de la versión B"></div>
+        </div>
+        <div>
+          <h3>Versión B: el checkout simplificado</h3>
+          <p class="sub">2 pasos y 5 campos para completar.</p>
+          <ul class="notas">
+            <li><b>Compra como invitada</b>Sin crear cuenta; se ofrece al final, como opción.</li>
+            <li><b>Menos campos</b>El código postal completa la ciudad y la provincia.</li>
+            <li><b>Total claro desde el inicio</b>El envío y el total se ven en el primer paso.</li>
+            <li><b>Billeteras y cuotas</b>Mercado Pago primero y las cuotas sin interés a la vista.</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="medicion">
+  <div class="wrap">
+    <h2>Cómo se mide</h2>
+    <p class="intro">Las dos versiones conviven en el mismo período. Así, la diferencia de resultados se debe al checkout y no a la temporada ni a la publicidad.</p>
+    <div class="scroll">
+    <table class="tabla">
+      <tr><th>Quiénes participan</th><td>Las visitas desde el celular que llegan al checkout, repartidas al azar: 50% ve la versión A y 50% la B.</td></tr>
+      <tr><th>Métrica principal</th><td>Finalización del checkout en celular: compras sobre checkouts iniciados. Hoy es del 34%.<small>Es la etapa que cambia el test. Medir la conversión total del celular necesitaría unos 3 meses con el tráfico actual.</small></td></tr>
+      <tr><th>Métricas de control</th><td>Conversión total del celular y ticket promedio.<small>La versión B no debe bajar el ticket: un checkout más corto no sirve si se vende menos por pedido.</small></td></tr>
+      <tr><th>Duración</th><td>Unas 7 semanas, hasta juntar alrededor de 150 checkouts iniciados por versión.<small>Con unos 186 checkouts móviles por mes, es el tiempo necesario para que la diferencia sea confiable.</small></td></tr>
+      <tr><th>Cuándo gana la B</th><td>Si la finalización del checkout sube del 34% al 50% o más, con 95% de confianza, y el ticket promedio se mantiene.</td></tr>
+      <tr><th>Dónde se sigue</th><td>En la página 2 del tablero, con el filtro de dispositivo en celular.</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Qué esperamos lograr</h2>
+    <p class="intro">Si el abandono del checkout en celular baja del 66% al 50%, con el tráfico y el ticket de septiembre:</p>
+    <div class="impacto">
+      <div><b>+29</b><span>compras por mes</span></div>
+      <div><b>$2 M</b><span>más de ingresos por mes</span></div>
+      <div><b>2,5%</b><span>de conversión total, sobre la meta de 2,3%</span></div>
+      <div><b>7 sem.</b><span>de test antes de aplicarlo a todos</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">ALMASAVIA · Segundo parcial de Analítica Web. Caso simulado con datos de septiembre de 2026; las pantallas son una propuesta de diseño.</div>
+</footer>
+
+<script>
+const carrito = `<div class="resumen"><span>Tote Planos XL + portatubos</span><b>$86.000</b></div>`;
+const A = [
+  {t:"Paso 1 de 4 · Tus datos", btn:"Continuar", html:`<h4>Creá tu cuenta</h4>
+    <div class="f">Email</div><div class="f">Contraseña</div><div class="f">Repetir contraseña</div>
+    <div class="row"><div class="f">Nombre</div><div class="f">Apellido</div></div>
+    <div class="f">DNI</div><div class="f">Teléfono</div><div class="f">Fecha de nacimiento</div>
+    <div class="aviso mal">Sin cuenta no se puede comprar.</div>`},
+  {t:"Paso 2 de 4 · Envío", btn:"Continuar", html:`<h4>Dirección de envío</h4>
+    <div class="row"><div class="f">Calle</div><div class="f">Número</div></div>
+    <div class="row"><div class="f">Piso</div><div class="f">Depto.</div></div>
+    <div class="f">Ciudad</div><div class="f">Provincia</div><div class="f">Código postal</div>
+    <div class="aviso mal">El costo de envío se calcula en el último paso.</div>`},
+  {t:"Paso 3 de 4 · Pago", btn:"Continuar", html:`<h4>Tarjeta de crédito o débito</h4>
+    <div class="f">Número de tarjeta</div><div class="f">Nombre como figura en la tarjeta</div>
+    <div class="row"><div class="f">Vencimiento</div><div class="f">CVV</div></div>
+    <div class="aviso mal">Las cuotas dependen de tu banco y se informan al confirmar.</div>`},
+  {t:"Paso 4 de 4 · Revisión", btn:"Confirmar compra", html:`<h4>Revisá tu pedido</h4>
+    <div class="tot"><span>Subtotal</span><span>$86.000</span></div>
+    <div class="tot"><span>Envío a domicilio</span><span>$4.500</span></div>
+    <div class="tot big"><span>Total</span><span>$90.500</span></div>
+    <div class="aviso mal">Recién acá aparece el costo de envío.</div>`},
+  {t:"Compra realizada", btn:"Volver a empezar", html:`<div class="hecho"><b>✓</b>Pedido confirmado</div>`}
+];
+const B = [
+  {t:"Paso 1 de 2 · Envío y contacto", btn:"Ir al pago", html:carrito+`<h4>¿A dónde lo enviamos?</h4>
+    <div class="f">Email</div><div class="f">Nombre y apellido</div><div class="f">Teléfono</div>
+    <div class="row"><div class="f">Código postal</div><div class="f auto">Córdoba, Córdoba</div></div>
+    <div class="f">Calle y número</div>
+    <div class="opt sel"><span>Envío a domicilio</span><b>$4.500</b></div>
+    <div class="opt"><span>Retiro en punto de entrega</span><b>Gratis</b></div>
+    <div class="aviso bien">Comprás como invitada; no hace falta crear cuenta.</div>`},
+  {t:"Paso 2 de 2 · Pago", btn:"Pagar $90.500", html:`<div class="resumen"><span>Total con envío</span><b>$90.500</b></div><h4>¿Cómo querés pagar?</h4>
+    <div class="opt mp">Pagar con Mercado Pago</div>
+    <div class="opt"><span>Otra billetera virtual</span><span>›</span></div>
+    <div class="opt"><span>Tarjeta de crédito o débito</span><span>›</span></div>
+    <div class="aviso bien">3 cuotas sin interés de $30.167</div>`},
+  {t:"Compra realizada", btn:"Volver a empezar", html:`<div class="hecho"><b>✓</b>Pedido confirmado</div>`}
+];
+function phone(id, steps){
+  const scr=document.getElementById("screen-"+id), dots=document.getElementById("pasos-"+id);
+  let i=0; const n=steps.length-1;
+  steps.slice(0,n).forEach((_,k)=>{const b=document.createElement("button");b.textContent=k+1;b.setAttribute("aria-label","Ver paso "+(k+1));b.onclick=()=>go(k);dots.appendChild(b);});
+  function go(k){
+    i=k; const s=steps[i];
+    scr.innerHTML=`<div class="bar"></div><div class="app-head"><div class="logo">ALMASAVIA</div><div class="paso">${s.t}</div><div class="prog"><i style="width:${Math.min(100,(i+1)/n*100)}%"></i></div></div><div class="body">${s.html}</div><div class="cta"><button type="button">${s.btn}</button></div>`;
+    scr.querySelector(".cta button").onclick=()=>go(i>=n?0:i+1);
+    [...dots.children].forEach((d,k)=>{ if(k===i) d.setAttribute("aria-current","step"); else d.removeAttribute("aria-current"); });
+  }
+  go(0);
+}
+phone("a",A); phone("b",B);
+document.querySelectorAll(".tabs button").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));
+  document.querySelectorAll(".version").forEach(v=>v.classList.toggle("activa",v.dataset.version===t.dataset.tab));
+}));
+</script>
+</body>
+</html>
